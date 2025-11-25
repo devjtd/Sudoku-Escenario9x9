@@ -4,7 +4,7 @@ import pygame
 import sys
 # Importa módulos propios de la lógica de datos y el núcleo del juego
 from manejador_datos import cargar_y_limpiar_datos
-from logica_nucleo import TIPO_MATRIZ
+from logica_nucleo import TIPO_MATRIZ, obtener_coordenadas_matriz
 
 import logica_prolog
 
@@ -58,6 +58,7 @@ OFFSET_GRILLA_Y = 150
 COLOR_FIJO = (0, 0, 150)            # Azul oscuro para números iniciales
 COLOR_GRILLA_FINA = (150, 150, 150) # Gris claro para líneas finas
 COLOR_GRILLA_GRUESA = (0, 0, 0)     # Negro para líneas gruesas
+COLOR_SELECCION = (100, 200, 255)   # Azul claro para la celda seleccionada
 
 # --- CLASE DE BOTÓN BÁSICA ---
 class Boton:
@@ -148,6 +149,21 @@ def dibujar_grilla(pantalla):
             grosor_linea
         )
 
+def dibujar_seleccion(pantalla, celda_seleccionada):
+    """Dibuja un recuadro de selección sobre la celda activa."""
+    if celda_seleccionada:
+        fila, columna = celda_seleccionada
+        x = OFFSET_GRILLA_X + columna * TAMANO_CELDA
+        y = OFFSET_GRILLA_Y + fila * TAMANO_CELDA
+        
+        # Dibuja un rectángulo con borde grueso para resaltar la selección
+        pygame.draw.rect(
+            pantalla, 
+            COLOR_SELECCION, 
+            (x, y, TAMANO_CELDA, TAMANO_CELDA), 
+            4 # Grosor del borde
+        )
+
 def dibujar_numeros(pantalla, matriz_actual, matriz_fija):
     """ Renderiza los números contenidos en la matriz NumPy sobre la grilla. """
     fuente_numero = pygame.font.Font(None, 40)
@@ -219,6 +235,9 @@ def ejecutar_juego():
     matriz_actual = matriz_inicial.copy().astype(TIPO_MATRIZ)
     print(f"Matriz de juego inicial cargada (NumPy):\n{matriz_actual}")
 
+    # --- ESTADO DE SELECCIÓN ---
+    celda_seleccionada = None # Tupla (fila, columna) o None
+
     # --- CREACIÓN Y POSICIONAMIENTO DE BOTONES ---
     ANCHO_BOTON = 250
     ALTO_BOTON = 70 
@@ -258,6 +277,18 @@ def ejecutar_juego():
             if ESTADO_ACTUAL == ESTADO_MENU:
                 for boton in botones_menu:
                     boton.manejar_evento(evento)
+            
+            # Manejo de eventos en ESTADO_JUEGO
+            elif ESTADO_ACTUAL == ESTADO_JUEGO:
+                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    # Obtiene las coordenadas de la matriz usando la función pura
+                    celda_seleccionada = obtener_coordenadas_matriz(
+                        evento.pos, 
+                        OFFSET_GRILLA_X, 
+                        OFFSET_GRILLA_Y, 
+                        TAMANO_CELDA
+                    )
+                    # print(f"Celda seleccionada: {celda_seleccionada}") # Debug
 
         # 4. Lógica de Renderizado
         
@@ -301,6 +332,7 @@ def ejecutar_juego():
             
             # Dibuja el Tablero de Sudoku y los números
             dibujar_grilla(pantalla)
+            dibujar_seleccion(pantalla, celda_seleccionada)
             dibujar_numeros(pantalla, matriz_actual, matriz_fija)
 
         # 5. Actualiza la pantalla para mostrar todos los cambios renderizados
