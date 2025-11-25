@@ -200,6 +200,13 @@ def generar_sudoku(dificultad='medio'):
     """
     # Genera un tablero completo
     tablero_completo = generar_tablero_completo()
+
+    # Muestra la matriz completa en consola (Solución)
+    if tablero_completo is not None:
+        print("\n" + "="*40)
+        print("TABLERO COMPLETO (SOLUCIÓN):")
+        print(tablero_completo)
+        print("="*40 + "\n")
     
     if tablero_completo is None:
         return None
