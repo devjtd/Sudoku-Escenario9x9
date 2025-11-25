@@ -4,7 +4,7 @@ import pygame
 import sys
 # Importa módulos propios de la lógica de datos y el núcleo del juego
 from manejador_datos import cargar_y_limpiar_datos
-from logica_nucleo import TIPO_MATRIZ, obtener_coordenadas_matriz
+from logica_nucleo import TIPO_MATRIZ, obtener_coordenadas_matriz, colocar_numero
 
 import logica_prolog
 
@@ -289,6 +289,35 @@ def ejecutar_juego():
                         TAMANO_CELDA
                     )
                     # print(f"Celda seleccionada: {celda_seleccionada}") # Debug
+
+                if evento.type == pygame.KEYDOWN:
+                    if celda_seleccionada:
+                        fila, columna = celda_seleccionada
+                        
+                        # Verifica si la celda es editable (no es un número fijo)
+                        # Nota: matriz_fija tiene 0 en las celdas vacías iniciales
+                        if matriz_fija[fila, columna] == 0:
+                            numero = None
+                            
+                            # Mapeo de teclas numéricas (Teclado superior y Numpad)
+                            if evento.key == pygame.K_1 or evento.key == pygame.K_KP1: numero = 1
+                            elif evento.key == pygame.K_2 or evento.key == pygame.K_KP2: numero = 2
+                            elif evento.key == pygame.K_3 or evento.key == pygame.K_KP3: numero = 3
+                            elif evento.key == pygame.K_4 or evento.key == pygame.K_KP4: numero = 4
+                            elif evento.key == pygame.K_5 or evento.key == pygame.K_KP5: numero = 5
+                            elif evento.key == pygame.K_6 or evento.key == pygame.K_KP6: numero = 6
+                            elif evento.key == pygame.K_7 or evento.key == pygame.K_KP7: numero = 7
+                            elif evento.key == pygame.K_8 or evento.key == pygame.K_KP8: numero = 8
+                            elif evento.key == pygame.K_9 or evento.key == pygame.K_KP9: numero = 9
+                            elif evento.key == pygame.K_BACKSPACE or evento.key == pygame.K_DELETE: numero = 0
+                            
+                            if numero is not None:
+                                try:
+                                    # Actualización Inmutable: Crea un nuevo estado del tablero
+                                    matriz_actual = colocar_numero(matriz_actual, fila, columna, numero)
+                                    # print(f"Número {numero} colocado en ({fila}, {columna})")
+                                except ValueError as e:
+                                    print(f"Error al colocar número: {e}")
 
         # 4. Lógica de Renderizado
         
