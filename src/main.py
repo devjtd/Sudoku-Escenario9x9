@@ -257,7 +257,7 @@ def dibujar_victoria(pantalla, estadisticas=None):
             pantalla.blit(surf, rect)
             y_offset += 40
 
-    texto_instruccion = pygame.font.Font(None, 30).render("Haz clic para volver al menú", True, (200, 200, 200))
+    texto_instruccion = pygame.font.Font(None, 30).render("Haz clic para volver al tablero", True, (200, 200, 200))
     rect_inst = texto_instruccion.get_rect(center=(ANCHO_PANTALLA // 2, ALTO_PANTALLA - 50))
     pantalla.blit(texto_instruccion, rect_inst)
 
@@ -459,7 +459,7 @@ def ejecutar_juego():
 
             elif ESTADO_ACTUAL == ESTADO_VICTORIA:
                 if evento.type == pygame.MOUSEBUTTONDOWN:
-                    ESTADO_ACTUAL = ESTADO_MENU
+                    ESTADO_ACTUAL = ESTADO_JUEGO
             
             elif ESTADO_ACTUAL == ESTADO_PUNTUACIONES:
                 if evento.type == pygame.MOUSEBUTTONDOWN or evento.type == pygame.KEYDOWN:
