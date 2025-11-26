@@ -1,3 +1,4 @@
-Nombre,Tiempo,Errores,Pistas,Fecha
-Jeanpierre,4.60,0,0,2025-11-26 11:04:23
-Jeanpierre,8.58,0,0,2025-11-26 11:38:13
+Nombre,Tiempo,Errores,Pistas,Puntaje,Estado,Fecha
+Jeanpierre,8.61,0,7,8582,Victoria,2025-11-26 12:27:33
+Jeanpierre,4.35,10,0,0,Derrota,2025-11-26 12:28:14
+Jeanpierre,5.00,10,0,0,Derrota,2025-11-26 12:28:25
