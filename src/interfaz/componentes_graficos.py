@@ -13,7 +13,29 @@ class BotonInteractivo:
         self.color_hover = color_hover
         self.color_actual = color_base
         self.accion = accion
-        self.fuente = pygame.font.Font(None, 48)
+        
+        # Calcula el tamaño de fuente óptimo basado en el ancho del botón
+        # y la longitud del texto para que siempre quepa
+        self.fuente = self._calcular_fuente_optima(texto, ancho, alto)
+
+    def _calcular_fuente_optima(self, texto, ancho_boton, alto_boton):
+        # Calcula el tamaño de fuente que mejor se ajusta al botón
+        # Comienza con un tamaño grande y reduce hasta que quepa
+        tamano_max = 48
+        tamano_min = 20
+        margen = 20  # Margen horizontal dentro del botón
+        
+        for tamano in range(tamano_max, tamano_min - 1, -2):
+            fuente_prueba = pygame.font.Font(None, tamano)
+            ancho_texto = fuente_prueba.size(texto)[0]
+            alto_texto = fuente_prueba.size(texto)[1]
+            
+            # Verifica si el texto cabe con margen
+            if ancho_texto <= (ancho_boton - margen) and alto_texto <= (alto_boton - 10):
+                return fuente_prueba
+        
+        # Si no cabe ni con el tamaño mínimo, usa el mínimo
+        return pygame.font.Font(None, tamano_min)
 
     def dibujar(self, pantalla):
         # Dibuja el botón con bordes redondeados
