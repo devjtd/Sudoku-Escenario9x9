@@ -112,3 +112,86 @@ class CampoTexto:
         # Dibuja el texto y el borde del campo
         pantalla.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         pygame.draw.rect(pantalla, self.color, self.rect, 2)
+
+class SelectorDificultad:
+    # Selector visual de dificultad con tres opciones: Fácil, Medio, Difícil
+    
+    def __init__(self, x, y, ancho_total, alto, color_base, color_hover, color_seleccionado):
+        # Inicializa el selector con tres botones horizontales
+        self.x = x
+        self.y = y
+        self.ancho_total = ancho_total
+        self.alto = alto
+        self.color_base = color_base
+        self.color_hover = color_hover
+        self.color_seleccionado = color_seleccionado
+        
+        # Opciones de dificultad
+        self.opciones = ['facil', 'medio', 'dificil']
+        self.textos = ['Fácil', 'Medio', 'Difícil']
+        self.seleccionado = 'medio'  # Dificultad por defecto
+        
+        # Calcula dimensiones de cada botón
+        self.ancho_boton = ancho_total // 3
+        self.espaciado = 5
+        
+        # Crea los rectángulos para cada botón
+        self.rectangulos = []
+        for i in range(3):
+            rect = pygame.Rect(
+                x + i * self.ancho_boton + (i * self.espaciado),
+                y,
+                self.ancho_boton - self.espaciado,
+                alto
+            )
+            self.rectangulos.append(rect)
+        
+        # Fuente para el texto
+        self.fuente = pygame.font.Font(None, 28)
+        
+        # Estado de hover
+        self.hover_index = -1
+    
+    def obtener_seleccion(self):
+        # Retorna la dificultad seleccionada actual
+        return self.seleccionado
+    
+    def manejar_evento(self, evento):
+        # Maneja eventos de mouse para cambiar la selección
+        if evento.type == pygame.MOUSEMOTION:
+            # Detecta sobre qué botón está el mouse
+            self.hover_index = -1
+            for i, rect in enumerate(self.rectangulos):
+                if rect.collidepoint(evento.pos):
+                    self.hover_index = i
+                    break
+        
+        if evento.type == pygame.MOUSEBUTTONDOWN:
+            # Cambia la selección al hacer clic
+            for i, rect in enumerate(self.rectangulos):
+                if rect.collidepoint(evento.pos):
+                    self.seleccionado = self.opciones[i]
+                    print(f"[MENU] Dificultad seleccionada: {self.textos[i]}")
+                    break
+    
+    def dibujar(self, pantalla):
+        # Dibuja los tres botones con el estado visual apropiado
+        for i, rect in enumerate(self.rectangulos):
+            # Determina el color del botón
+            if self.opciones[i] == self.seleccionado:
+                color = self.color_seleccionado
+            elif i == self.hover_index:
+                color = self.color_hover
+            else:
+                color = self.color_base
+            
+            # Dibuja el botón con bordes redondeados
+            pygame.draw.rect(pantalla, color, rect, 0, 6)
+            
+            # Renderiza y centra el texto
+            superficie_texto = self.fuente.render(self.textos[i], True, NEGRO)
+            posicion_texto = (
+                rect.x + (rect.width - superficie_texto.get_width()) // 2,
+                rect.y + (rect.height - superficie_texto.get_height()) // 2
+            )
+            pantalla.blit(superficie_texto, posicion_texto)

@@ -8,7 +8,7 @@ import time
 
 # Importa módulos del proyecto
 from interfaz.constantes_visuales import *
-from interfaz.componentes_graficos import BotonInteractivo, CampoTexto
+from interfaz.componentes_graficos import BotonInteractivo, CampoTexto, SelectorDificultad
 from interfaz.renderizador_juego import (dibujar_grilla, dibujar_seleccion, dibujar_numeros, dibujar_victoria, dibujar_derrota, dibujar_tabla_puntuaciones)
 from datos.gestor_puntuaciones import guardar_puntuacion_jugador, cargar_puntuaciones_jugador
 from datos.cargador_tableros import generar_tablero_nuevo
@@ -54,6 +54,7 @@ def ejecutar_juego():
     # Variables de estado del juego
     estado_actual = ESTADO_MENU
     nombre_usuario = "Jugador"
+    dificultad_seleccionada = 'medio'  # Dificultad seleccionada por el usuario
     tiempo_inicio = 0
     errores_contador = 0
     pistas_contador = 0
@@ -75,10 +76,10 @@ def ejecutar_juego():
         nonlocal matriz_actual, matriz_fija, matriz_errores, matriz_inicial, matriz_solucion
         print("\n" + "-"*60)
         print("[JUEGO] Transición: MENU -> JUEGO")
-        print("[JUEGO] Generando nuevo tablero...")
+        print(f"[JUEGO] Generando nuevo tablero con dificultad: {dificultad_seleccionada.upper()}")
         
-        # Genera un tablero completamente nuevo
-        nueva_matriz, nueva_solucion = generar_tablero_nuevo()
+        # Genera un tablero completamente nuevo con la dificultad seleccionada
+        nueva_matriz, nueva_solucion = generar_tablero_nuevo(dificultad_seleccionada)
         
         # Si la generación fue exitosa, actualiza todas las matrices
         if nueva_matriz is not None:
@@ -127,8 +128,8 @@ def ejecutar_juego():
         # Genera un tablero completamente nuevo
         nonlocal matriz_actual, matriz_fija, matriz_errores, matriz_inicial, matriz_solucion
         nonlocal tiempo_inicio, errores_contador, pistas_contador
-        print("\n[USUARIO] Solicitando nuevo tablero...")
-        nueva_matriz, nueva_solucion = generar_tablero_nuevo()
+        print(f"\n[USUARIO] Solicitando nuevo tablero con dificultad: {dificultad_seleccionada.upper()}")
+        nueva_matriz, nueva_solucion = generar_tablero_nuevo(dificultad_seleccionada)
         # Si la generación fue exitosa, actualiza todas las matrices
         if nueva_matriz is not None:
             # INMUTABILIDAD: Asigna nuevas matrices en lugar de modificar las existentes
@@ -185,6 +186,17 @@ def ejecutar_juego():
     boton_salir = BotonInteractivo(POSICION_X_BOTON, POSICION_Y_INICIO + ESPACIO_Y * 2, ANCHO_BOTON, ALTO_BOTON, "Salir", COLOR_SALIR_BASE, COLOR_SALIR_HOVER, accion_salir_juego)
     botones_menu = [boton_jugar, boton_puntuaciones, boton_salir]
     
+    # Selector de dificultad
+    selector_dificultad = SelectorDificultad(
+        POSICION_X_BOTON, 
+        POSICION_Y_INICIO - 200,  
+        ANCHO_BOTON, 
+        50, 
+        COLOR_DIFICULTAD_BASE, 
+        COLOR_DIFICULTAD_HOVER, 
+        COLOR_DIFICULTAD_SELECCIONADO
+    )
+    
     caja_texto_usuario = CampoTexto(POSICION_X_BOTON, POSICION_Y_INICIO - 80, 250, 50, nombre_usuario)
 
     # Botones del juego
@@ -212,6 +224,10 @@ def ejecutar_juego():
             # Maneja eventos del menú principal
             if estado_actual == ESTADO_MENU:
                 for boton in botones_menu: boton.manejar_evento(evento)
+                
+                # Maneja eventos del selector de dificultad
+                selector_dificultad.manejar_evento(evento)
+                dificultad_seleccionada = selector_dificultad.obtener_seleccion()
                 
                 # Actualiza el nombre de usuario
                 nuevo_texto = caja_texto_usuario.manejar_evento(evento)
@@ -342,6 +358,13 @@ def ejecutar_juego():
                 pantalla.blit(fuente.render(TITULO_JUEGO, True, BLANCO), (ANCHO_PANTALLA // 2 - 200, 80))
             
             for boton in botones_menu: boton.dibujar(pantalla)
+            
+            # Dibuja el selector de dificultad
+            selector_dificultad.dibujar(pantalla)
+            fuente_dif = pygame.font.Font(None, 30)
+            lbl_dif = fuente_dif.render("Dificultad:", True, BLANCO)
+            pantalla.blit(lbl_dif, (selector_dificultad.x, selector_dificultad.y - 30))
+            
             caja_texto_usuario.dibujar(pantalla)
             
             # Etiqueta de usuario
