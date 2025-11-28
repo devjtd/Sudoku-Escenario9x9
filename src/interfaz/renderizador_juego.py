@@ -115,38 +115,95 @@ def dibujar_tabla_puntuaciones(pantalla, puntuaciones, nombre_usuario):
     pantalla.fill(COLOR_FONDO_JUEGO)
     fuente_titulo = pygame.font.Font(None, 60)
     titulo = fuente_titulo.render(f"Puntuaciones de {nombre_usuario}", True, BLANCO)
-    pantalla.blit(titulo, (ANCHO_PANTALLA // 2 - titulo.get_width() // 2, 50))
+    pantalla.blit(titulo, (ANCHO_PANTALLA // 2 - titulo.get_width() // 2, 30))
 
     if not puntuaciones:
         fuente_msg = pygame.font.Font(None, 40)
         msg = fuente_msg.render("No hay puntuaciones registradas.", True, BLANCO)
         pantalla.blit(msg, (ANCHO_PANTALLA // 2 - msg.get_width() // 2, 200))
     else:
-        # Muestra tabla de puntuaciones
-        y = 150
-        fuente_fila = pygame.font.Font(None, 30)
-        # Ajustamos el espaciado para las nuevas columnas
-        cabecera = f"{'Fecha':<19} {'Tiempo':<8} {'Err':<5} {'Pistas':<6} {'Puntaje':<8} {'Estado':<10}"
-        surf_cab = fuente_fila.render(cabecera, True, (200, 200, 0))
-        pantalla.blit(surf_cab, (ANCHO_PANTALLA // 2 - 350, y))
-        y += 40
+        # Ordena las puntuaciones por fecha (más recientes primero)
+        puntuaciones_ordenadas = sorted(puntuaciones, key=lambda x: x.get('Fecha', ''), reverse=True)
         
-        # Muestra las últimas 10 partidas
-        for p in puntuaciones[-10:]:
+        # Muestra tabla de puntuaciones
+        y = 120
+        fuente_cabecera = pygame.font.Font(None, 28)
+        fuente_fila = pygame.font.Font(None, 24)
+        
+        # Define anchos de columna para mejor alineación
+        x_inicio = 80
+        col_fecha = x_inicio
+        col_tiempo = col_fecha + 150
+        col_errores = col_tiempo + 90
+        col_pistas = col_errores + 80
+        col_puntaje = col_pistas + 80
+        col_estado = col_puntaje + 100
+        
+        # Dibuja cabecera con color destacado
+        cabeceras = [
+            ("Fecha", col_fecha),
+            ("Tiempo", col_tiempo),
+            ("Errores", col_errores),
+            ("Pistas", col_pistas),
+            ("Puntaje", col_puntaje),
+            ("Estado", col_estado)
+        ]
+        
+        for texto, x_pos in cabeceras:
+            surf_cab = fuente_cabecera.render(texto, True, (255, 215, 0))  # Color dorado
+            pantalla.blit(surf_cab, (x_pos, y))
+        
+        # Línea separadora debajo de la cabecera
+        pygame.draw.line(pantalla, (255, 215, 0), (x_inicio, y + 30), (col_estado + 100, y + 30), 2)
+        y += 45
+        
+        # Muestra las últimas 12 partidas (más espacio eficiente)
+        for i, p in enumerate(puntuaciones_ordenadas[:12]):
             # Obtiene datos de cada puntuación con valores por defecto
-            fecha = p.get('Fecha', 'N/A')
+            fecha_completa = p.get('Fecha', 'N/A')
+            # Acorta la fecha: "2025-11-28 15:30:45" -> "28/11 15:30"
+            try:
+                if fecha_completa != 'N/A' and len(fecha_completa) >= 16:
+                    # Extrae día/mes hora:minuto
+                    fecha_corta = f"{fecha_completa[8:10]}/{fecha_completa[5:7]} {fecha_completa[11:16]}"
+                else:
+                    fecha_corta = fecha_completa
+            except:
+                fecha_corta = fecha_completa
+            
             tiempo = p.get('Tiempo', '0')
             errores = p.get('Errores', '0')
             pistas = p.get('Pistas', '0')
             puntaje = p.get('Puntaje', '0')
             estado = p.get('Estado', 'N/A')
             
-            # Formatea y dibuja la fila
-            fila_str = f"{fecha:<19} {tiempo:<8} {errores:<5} {pistas:<6} {puntaje:<8} {estado:<10}"
-            surf_fila = fuente_fila.render(fila_str, True, BLANCO)
-            pantalla.blit(surf_fila, (ANCHO_PANTALLA // 2 - 350, y))
-            y += 30
+            # Color alternado para mejor legibilidad
+            color_fila = BLANCO if i % 2 == 0 else (200, 200, 200)
+            
+            # Color especial para victorias/derrotas
+            if estado == 'Victoria':
+                color_estado = (0, 255, 0)  # Verde
+            elif estado == 'Derrota':
+                color_estado = (255, 100, 100)  # Rojo claro
+            else:
+                color_estado = color_fila
+            
+            # Dibuja cada columna
+            datos = [
+                (fecha_corta, col_fecha, color_fila),
+                (f"{tiempo}s", col_tiempo, color_fila),
+                (str(errores), col_errores, color_fila),
+                (str(pistas), col_pistas, color_fila),
+                (str(puntaje), col_puntaje, color_fila),
+                (estado, col_estado, color_estado)
+            ]
+            
+            for texto, x_pos, color in datos:
+                surf_fila = fuente_fila.render(str(texto), True, color)
+                pantalla.blit(surf_fila, (x_pos, y))
+            
+            y += 32
 
     # Instrucción para volver al menú
-    texto_volver = pygame.font.Font(None, 30).render("Presiona ESC o clic para volver", True, (200, 200, 200))
-    pantalla.blit(texto_volver, (ANCHO_PANTALLA // 2 - texto_volver.get_width() // 2, ALTO_PANTALLA - 50))
+    texto_volver = pygame.font.Font(None, 28).render("Presiona ESC o clic para volver al menú", True, (200, 200, 200))
+    pantalla.blit(texto_volver, (ANCHO_PANTALLA // 2 - texto_volver.get_width() // 2, ALTO_PANTALLA - 40))
