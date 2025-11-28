@@ -6,47 +6,6 @@ import numpy as np
 # Inicialización del motor de Prolog
 motor_prolog = Prolog()
 
-def configurar_reglas_sudoku():
-    # Carga reglas básicas de Prolog para pruebas de conectividad
-    # Define relaciones de amistad para pruebas
-    motor_prolog.assertz("es_amigo(juan, maria)")
-    motor_prolog.assertz("es_amigo(juan, pedro)")
-    
-    print("Reglas básicas de Prolog cargadas.")
-
-def probar_conexion_prolog():
-    # Verifica la comunicación entre Python y Prolog ejecutando una consulta simple
-    print("\n--- Prueba de Conexión Prolog ---")
-    
-    try:
-        # Ejecuta la consulta 'es_amigo(juan, Amigo)'
-        consulta = motor_prolog.query("es_amigo(juan, Amigo)")
-        
-        resultados = []
-        # Procesa cada resultado de la consulta
-        for res in consulta:
-            amigo = res["Amigo"]
-    
-            # Decodifica la respuesta de bytes a string si es necesario
-            if isinstance(amigo, bytes):
-                amigo = amigo.decode('utf-8')
-    
-            resultados.append(amigo)
-        
-        # Verifica si se obtuvieron resultados
-        if resultados:
-            print(f"Conexión exitosa. Amigos encontrados para Juan: {resultados}")
-            return True
-        else:
-            print("ERROR: La consulta a Prolog no retornó resultados. Revisa la instalación de SWI-Prolog y variables de entorno.")
-            return False
-            
-    # Captura errores de comunicación con Prolog
-    except Exception as e:
-        print(f"ERROR CRÍTICO en PySWIP/Prolog: {e}")
-        print("Asegúrate que SWI-Prolog está instalado y accesible en la ruta del sistema.")
-        return False
-
 # --- Funciones de Conversión de Datos ---
 
 def matriz_numpy_a_lista(matriz_numpy: np.ndarray) -> list:
@@ -100,7 +59,7 @@ def configurar_reglas_sudoku_validacion():
             valido_en_columna(Matriz, Columna, Numero),
             valido_en_bloque(Matriz, Fila, Columna, Numero)
     """)
-    
+
     print("Reglas de validación de Sudoku cargadas en Prolog.")
 
 def validar_numero_prolog(matriz, fila, col, num):
@@ -124,9 +83,6 @@ def validar_numero_prolog(matriz, fila, col, num):
         # En caso de error, retorna False por seguridad
         return False
 
-# Configura las reglas inmediatamente al cargar el módulo
-configurar_reglas_sudoku()
+# Configura las reglas de validación al cargar el módulo
 configurar_reglas_sudoku_validacion()
 
-# Ejecuta la prueba de conexión inmediatamente al cargar el módulo
-probar_conexion_prolog()

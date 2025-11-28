@@ -5,8 +5,6 @@ from nucleo.generador_tableros import generar_sudoku
 
 def generar_tablero_nuevo(dificultad='medio'):
     # Genera un tablero de Sudoku con el nivel de dificultad especificado
-    print(f"Generando tablero de Sudoku con dificultad: {dificultad}")
-    
     matriz_inicial, matriz_solucion = generar_sudoku(dificultad)
     
     if matriz_inicial is None:
